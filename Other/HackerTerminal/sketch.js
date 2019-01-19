@@ -165,7 +165,7 @@ let initialization = {
         5: function (i) {
             noStroke();
             textSize(initialization.fontSettings.sizeM());
-            text("We hereby inform you, that this system is under control of the Police department and the government. Unauthorized accesses will be investigated and persecuted",
+            text("AAAAAAAA",
                 initialization.offSetX + initialization.padding,
                 initialization.offSetY + 8 * initialization.padding,
                 initialization.terminal_Width - 2 * initialization.padding,
