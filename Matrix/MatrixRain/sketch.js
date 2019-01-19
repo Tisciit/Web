@@ -3,11 +3,11 @@ let allowedchars = "!§$%&/()=?²³{[]}\"üäöÜÄÖ+#-*'_~.:,;<>|abcdefghijklm
 let chars = [];
 let cols = 0;
 
-const size = 8;
-const spawnProb = .15;
+const size = 12;
+const spawnProb = .05;
 
 function setup() {
-    createCanvas(windowWidth - 5, windowHeight - 5);
+    createCanvas(windowWidth, windowHeight);
     textSize(size);
 
     cols = windowWidth / size;
@@ -17,7 +17,7 @@ function setup() {
     //     chars.push(new MatrixText(allowedchars[r], size, i * size, 0, 1));
     // }
 
-    frameRate(30);
+    frameRate(20);
 }
 
 function draw() {
@@ -42,4 +42,12 @@ function draw() {
             chars.push(new MatrixText(allowedchars[r], size, i * size, 0, random()));
         }
     }
+}
+
+function mousePressed(){
+    fullscreen(!fullscreen());
+}
+
+function windowResized() {
+    resizeCanvas(windowWidth, windowHeight);
 }
