@@ -20,10 +20,10 @@ class MatrixCol {
 
         if (this.characters.length == 0) {
             /** Populate new */
-            this.curY = floor(random(this.size, height / this.size / 3)); /** Spawn in upper third */
+            this.curY = floor(random(this.size / 2, height / this.size / 3)); /** Spawn in upper third */
             this.curY *= this.size; //harmonize?
             this.y = this.curY;
-            this.desiredY = this.curY + floor(random(height * .7 - this.curY));
+            this.desiredY = this.curY + floor(random(height * .8 - this.curY));
             this.ttl = floor(random(100, 200));
 
             /** Add first char */

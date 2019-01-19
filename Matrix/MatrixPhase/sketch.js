@@ -1,6 +1,6 @@
 // let allowedchars = "♥";
 let columns = [];
-const size = 8;
+const size = 18;
 
 function setup() {
     createCanvas(windowWidth, windowHeight);
@@ -18,8 +18,6 @@ function setup() {
     background(30);
 }
 
-let fps = [];
-
 function draw() {
 
     background(color(20, 50));
@@ -36,8 +34,18 @@ function draw() {
     let y = height * .03;
     fill(20);
     rectMode(CENTER);
-    rect(x, y, 50, 80);
+    rect(x, y, 50, 80);    
+    pop();
 
+    //doFPSStuff();
+}
+
+let fps = [];
+
+function doFPSStuff() {
+    let x = width * .99;
+    let y = height * .03;
+    push();
     fill(255);
     textSize(20);
     textAlign(CENTER);
@@ -47,6 +55,7 @@ function draw() {
     let sum = getSum(fps);
     let avg = sum / fps.length;
     text(round(avg, 2), x, y + 20);
+
     pop();
 
     if (curFPS.length > 10000) {
