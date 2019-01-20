@@ -1,5 +1,4 @@
 class SortingObject {
-
     constructor(value) {
         this.value = value;
         this.x = 0;
