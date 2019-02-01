@@ -1,12 +1,17 @@
 class Point {
 
-    constructor(x, y, size) {
+    constructor(x, y, size, brain) {
         this.size = size;
         this.position = createVector(x, y);
         this.velocity = createVector();;
         this.acceleration = createVector();
         this.alive = true;
-        this.brain = new Brain(400);
+        if (brain) {
+            this.brain = brain;
+            this.brain.step = 0;
+        } else {
+            this.brain = new Brain(400);
+        }
     }
 
 
@@ -35,7 +40,16 @@ class Point {
         return false;
     }
 
-    update(obstacles) {
+    checkTargetReached(target) {
+        let d = dist(this.position.x, this.position.y, target.position.x, target.position.y);
+        if (d <= target.size / 2) {
+            this.alive = false;
+            this.velocity = createVector();
+            this.acceleration = createVector();
+        }
+    }
+
+    update(obstacles, target) {
         if (this.alive) {
             this.move();
             this.alive = !this.checkCollision(obstacles);
@@ -44,19 +58,28 @@ class Point {
                 console.log("im ded");
                 this.velocity = createVector();
                 this.acceleration = createVector();
+            } else {
+                this.checkTargetReached(target);
             }
         }
+    }
+
+    calculateFitness(target) {
+        return 1 / dist(this.position.x, this.position.y, target.position.x, target.position.y);
     }
 
 }
 
 class Brain {
-    constructor(instructions) {
+    constructor(numinstructions, givenInstructions) {
         this.instructions = [];
+        for (let i = 0; i < numinstructions; i++) {
+            this.instructions[i] = givenInstructions ? givenInstructions[i] : "";
+        }
         this.step = 0;
 
-        for (let i = 0; i < instructions; i++) {
-            this.instructions[i] = p5.Vector.random2D();
+        if (!givenInstructions) {
+            this.mutate(1);
         }
     }
 
@@ -68,11 +91,25 @@ class Brain {
         this.step++;
         return ret;
     }
+
+    mutate(rate) {
+        for (let i = 0; i < this.instructions.length; i++) {
+            if (Math.random() < rate) {
+                this.instructions[i] = p5.Vector.random2D();
+            }
+        }
+        this.step = 0;
+    }
+
+    copy() {
+        return new Brain(this.instructions.length, this.instructions);
+    }
 }
 
 class Generation {
     constructor(members) {
         this.points = [];
+        this.gen = 1;
 
         for (let i = 0; i < members; i++) {
             this.points.push(new Point(width / 2, height * .8, 10));
@@ -80,20 +117,77 @@ class Generation {
     }
 
     draw() {
-        for(let p of this.points){
+        for (let p of this.points) {
             p.draw();
         }
     }
 
-    update(obstacles) {
+    update(obstacles, target) {
         for (let p of this.points) {
-            p.update(obstacles);
+            p.update(obstacles, target);
         }
+    }
+
+    fitness(target) {
+        let fitnessObject = {};
+        let sum = 0;
+        for (let p of this.points) {
+            let fit = p.calculateFitness(target);
+            p.fitnessRAW = fit;
+            sum += fit;
+        }
+        for (let p of this.points) {
+            p.fitness = (p.fitnessRAW / sum);
+        }
+
+        let rangeStart = 0;
+        for (let i = 0; i < this.points.length; i++) {
+            let range = this.points[i].fitness;
+            fitnessObject[i] = {
+                rangeStart: rangeStart,
+                rangeEnd: rangeStart += range,
+            };
+        }
+
+        this.fitnessObject = fitnessObject;
+    }
+
+    checkAlive() {
+        for (let p of this.points) {
+            if (p.alive) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    getNewGeneration(mutateRate, startX, startY, size) {
+        let genZ = [];
+        for (let i = 0; i < this.points.length; i++) {
+            console.log(i);
+
+            let rnd = Math.random();
+            let n = 0;
+            for (n = 0; n < this.points.length; n++) {
+                if (rnd <= this.fitnessObject[n].rangeEnd) {
+                    console.log(n);
+                    break; //n is now index of point to copy
+                }
+            }
+
+            let newBrain = this.points[n].brain.copy();
+
+            genZ.push(new Point(startX, startY, size, newBrain));
+            console.log(genZ);
+            genZ[genZ.length - 1].brain.mutate(mutateRate);
+        }
+        this.points = genZ;
+        this.gen++;
     }
 }
 
 class Obstacle {
-    constructor(c, x1, y1, x2, y2) {
+    constructor(c, x1, y1, x2, y2, type) {
         this.color = c;
         this.p1 = createVector(x1, y1);
         this.p2 = createVector(x2, y2);
@@ -104,6 +198,22 @@ class Obstacle {
         rectMode(CORNERS);
         fill(this.color);
         rect(this.p1.x, this.p1.y, this.p2.x, this.p2.y);
+        pop();
+    }
+}
+
+class Target {
+    constructor(c, v) {
+        this.color = c;
+        this.position = v;
+        this.size = 10;
+    }
+
+    draw() {
+        push();
+
+        fill(this.color);
+        ellipse(this.position.x, this.position.y, this.size);
         pop();
     }
 }
