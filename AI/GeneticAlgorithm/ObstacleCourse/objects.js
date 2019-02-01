@@ -206,9 +206,9 @@ class Obstacle {
         this.dir = dir;
         this.speed = speed;
 
-        this.origin1 = createVector(x1, y1);
-        this.origin2 = createVector(x2, y2);
-        this.originDir = dir;
+        this.origin1 = this.p1;
+        this.origin2 = this.p2;
+        this.originDir = this.dir;
     }
 
     draw() {
@@ -241,12 +241,6 @@ class Obstacle {
         }
     }
 
-    reset() {
-        this.p1 = this.origin1;
-        this.p2 = this.origin2;
-        this.dir = this.originDir;
-    }
-
     checkCollision(obstacles) {
         if (this.speed > 0) { //Prevent checking of non-moving obstacles
             let upper = this.p1.y;
@@ -260,24 +254,29 @@ class Obstacle {
                     let oLower = o.p2.y;
                     let oLeft = o.p1.x;
                     let oRight = o.p2.x;
-                    
+
                     //at least two have to be true in order for obstacles to collide
                     let count = 0;
                     //this upper between lower of o and upper of o OR corresponding other sides
                     if (oLower >= upper && upper >= oUpper) {
                         count++;
-                    }
-                    if (oUpper <= lower && lower <= oLower) {
+                        if (oLeft <= left && left <= oRight) {
+                            count++;
+                        }
+                        if (oRight <= right && right <= oLeft) {
+                            count++;
+                        }
+                    } else if (oUpper <= lower && lower <= oLower) {
                         count++;
-                    }
-                    if (oLeft <= left && left <= oRight) {
-                        count++;
-                    }
-                    if (oRight <= right && right <= oLeft) {
-                        count++;
+                        if (oLeft <= left && left <= oRight) {
+                            count++;
+                        }
+                        if (oRight <= right && right <= oLeft) {
+                            count++;
+                        }
                     }
 
-                    if(count > 1){
+                    if (count > 1) {
                         this.switchdir();
                     }
                 }
