@@ -199,10 +199,16 @@ class Generation {
 }
 
 class Obstacle {
-    constructor(c, x1, y1, x2, y2) {
+    constructor(c, x1, y1, x2, y2, dir, speed) {
         this.color = c;
         this.p1 = createVector(x1, y1);
         this.p2 = createVector(x2, y2);
+        this.dir = dir;
+        this.speed = speed;
+
+        this.origin1 = createVector(x1, y1);
+        this.origin2 = createVector(x2, y2);
+        this.originDir = dir;
     }
 
     draw() {
@@ -215,7 +221,85 @@ class Obstacle {
     }
 
     move() {
+        switch (this.dir) {
+            case "r":
+                this.p1.add(createVector(this.speed, 0));
+                this.p2.add(createVector(this.speed, 0));
+                break;
+            case "l":
+                this.p1.add(createVector(-this.speed, 0));
+                this.p2.add(createVector(-this.speed, 0));
+                break;
+            case "u":
+                this.p1.add(createVector(0, -this.speed));
+                this.p2.add(createVector(0, -this.speed));
+                break;
+            case "d":
+                this.p1.add(createVector(0, this.speed));
+                this.p2.add(createVector(0, this.speed));
+                break;
+        }
+    }
 
+    reset() {
+        this.p1 = this.origin1;
+        this.p2 = this.origin2;
+        this.dir = this.originDir;
+    }
+
+    checkCollision(obstacles) {
+        if (this.speed > 0) { //Prevent checking of non-moving obstacles
+            let upper = this.p1.y;
+            let lower = this.p2.y;
+            let left = this.p1.x;
+            let right = this.p2.x;
+
+            for (let o of obstacles) {
+                if (o != this) {
+                    let oUpper = o.p1.y;
+                    let oLower = o.p2.y;
+                    let oLeft = o.p1.x;
+                    let oRight = o.p2.x;
+                    
+                    //at least two have to be true in order for obstacles to collide
+                    let count = 0;
+                    //this upper between lower of o and upper of o OR corresponding other sides
+                    if (oLower >= upper && upper >= oUpper) {
+                        count++;
+                    }
+                    if (oUpper <= lower && lower <= oLower) {
+                        count++;
+                    }
+                    if (oLeft <= left && left <= oRight) {
+                        count++;
+                    }
+                    if (oRight <= right && right <= oLeft) {
+                        count++;
+                    }
+
+                    if(count > 1){
+                        this.switchdir();
+                    }
+                }
+            }
+        }
+    }
+
+    switchdir() {
+        switch (this.dir) {
+            case "r":
+                this.dir = "l";
+                break;
+            case "l":
+                this.dir = "r";
+                break;
+            case "u":
+                this.dir = "d";
+                break;
+            case "d":
+                this.dir = "u";
+                break;
+        }
     }
 }
 
@@ -228,7 +312,6 @@ class Target {
 
     draw() {
         push();
-
         fill(this.color);
         ellipse(this.position.x, this.position.y, this.size);
         pop();
