@@ -71,7 +71,7 @@ class Point {
 
     calculateFitness(target) {
         if (this.targetReached) {
-            return 1 / 16 + 1000 / (Math.pow(this.brain.step, 2));
+            return 1 / 10 + 100 / (Math.pow(this.brain.step, 2));
         } else {
             return 1 / Math.pow(dist(this.position.x, this.position.y, target.position.x, target.position.y), 2);
         }
@@ -116,12 +116,12 @@ class Brain {
 }
 
 class Generation {
-    constructor(members) {
+    constructor(members, x, y, size) {
         this.points = [];
         this.gen = 1;
 
         for (let i = 0; i < members; i++) {
-            this.points.push(new Point(width / 2, height * .8, 10));
+            this.points.push(new Point(x, y, size));
         }
     }
 
@@ -173,13 +173,13 @@ class Generation {
     getNewGeneration(mutateRate, startX, startY, size) {
         let genZ = [];
         for (let i = 0; i < this.points.length; i++) {
-            console.log(i);
+            //console.log(i);
 
             let rnd = Math.random();
             let n = 0;
             for (n = 0; n < this.points.length; n++) {
                 if (rnd <= this.fitnessObject[n].rangeEnd) {
-                    console.log(n);
+                    //console.log(n);
                     break; //n is now index of point to copy
                 }
             }
@@ -187,7 +187,7 @@ class Generation {
             let newBrain = this.points[n].brain.copy();
 
             genZ.push(new Point(startX, startY, size, newBrain));
-            console.log(genZ);
+            //console.log(genZ);
             genZ[genZ.length - 1].brain.mutate(mutateRate);
         }
         this.points = genZ;
@@ -204,6 +204,7 @@ class Obstacle {
 
     draw() {
         push();
+        noStroke();
         rectMode(CORNERS);
         fill(this.color);
         rect(this.p1.x, this.p1.y, this.p2.x, this.p2.y);
