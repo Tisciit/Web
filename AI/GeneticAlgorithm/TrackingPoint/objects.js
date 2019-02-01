@@ -6,6 +6,7 @@ class Point {
         this.velocity = createVector();;
         this.acceleration = createVector();
         this.alive = true;
+        this.targetReached = false;
         if (brain) {
             this.brain = brain;
             this.brain.step = 0;
@@ -19,8 +20,8 @@ class Point {
         ellipse(this.position.x, this.position.y, this.size);
     }
 
-    move() {
-        this.acceleration = this.brain.getNext();
+    move(acc) {
+        this.acceleration = acc;
         this.velocity.add(this.acceleration);
         this.velocity.limit(5);
         this.position.add(this.velocity);
@@ -44,6 +45,7 @@ class Point {
         let d = dist(this.position.x, this.position.y, target.position.x, target.position.y);
         if (d <= target.size / 2) {
             this.alive = false;
+            this.targetReached = true;
             this.velocity = createVector();
             this.acceleration = createVector();
         }
@@ -51,11 +53,14 @@ class Point {
 
     update(obstacles, target) {
         if (this.alive) {
-            this.move();
-            this.alive = !this.checkCollision(obstacles);
-
+            let newAcc = this.brain.getNext();
+            if (newAcc.x != 0 && newAcc.y != 0) {
+                this.move(newAcc);
+                this.alive = !this.checkCollision(obstacles);
+            } else {
+                this.alive = false;
+            }
             if (!this.alive) {
-                console.log("im ded");
                 this.velocity = createVector();
                 this.acceleration = createVector();
             } else {
@@ -65,7 +70,11 @@ class Point {
     }
 
     calculateFitness(target) {
-        return 1 / dist(this.position.x, this.position.y, target.position.x, target.position.y);
+        if (this.targetReached) {
+            return 1 / 16 + 1000 / (Math.pow(this.brain.step, 2));
+        } else {
+            return 1 / Math.pow(dist(this.position.x, this.position.y, target.position.x, target.position.y), 2);
+        }
     }
 
 }
@@ -203,10 +212,10 @@ class Obstacle {
 }
 
 class Target {
-    constructor(c, v) {
+    constructor(c, v, size) {
         this.color = c;
         this.position = v;
-        this.size = 10;
+        this.size = size;
     }
 
     draw() {
