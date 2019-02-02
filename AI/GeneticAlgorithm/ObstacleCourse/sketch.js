@@ -2,10 +2,10 @@ let generation;
 let obstacles = [];
 let target;
 let skip = 1;
-let mutationRate = .1;
+let mutationRate = .01;
 
 function setup() {
-    createCanvas(1000, 600);
+    createCanvas(1000, 400);
     background(52);
     generation = new Generation(200, width * .1, height / 2, 5);
     createObstacles();
@@ -59,5 +59,5 @@ function createObstacles() {
     obstacles.push(new Obstacle(c, width * .7, 100, width * .7 + OBSTACLESIZE, 140, "r", 5));
     obstacles.push(new Obstacle(c, width * .9, 300, width * .9 + OBSTACLESIZE, 340, "r", 5));
     obstacles.push(new Obstacle(c, width * .7, 200, width * .7 + OBSTACLESIZE, 340, "r", 5));
-    obstacles.push(new Obstacle(c, width * .9, 400, width * .9 + OBSTACLESIZE, 440, "r", 5));
+    obstacles.push(new Obstacle(c, width * .9, 50, width * .9 + OBSTACLESIZE, 100, "r", 5));
 }
