@@ -3,8 +3,8 @@ let allowedchars = "!§$%&/()=?²³{[]}\"üäöÜÄÖ+#-*'_~.:,;<>|abcdefghijklm
 let chars = [];
 let cols = 0;
 
-const size = 12;
-const spawnProb = .05;
+const size = 20;
+const spawnProb = .03;
 
 function setup() {
     createCanvas(windowWidth, windowHeight);
@@ -22,7 +22,7 @@ function setup() {
 
 function draw() {
 
-    background(color(55, 55, 55, 50));
+    background(color(55, 55, 55, 100));
 
     for (let i = chars.length - 1; i >= 0; i--) {
         fill(color(0, 143, 17));
